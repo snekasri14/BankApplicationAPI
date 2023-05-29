@@ -1,5 +1,4 @@
 <?php
-
 function sqlConnection (){
     $Servername = "localhost";
     $Username= "root";
