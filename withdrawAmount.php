@@ -1,51 +1,70 @@
 <?php
 // include the file from connection.php that has db connections
+
 include "./connection.php";
 $data=json_decode(file_get_contents('php://input'));
+
 //assoc array response with default failure 
-$response=[
+$response = [
     'resultCode'=>200,
     'message'=>'Amount deposited failure ',
     'resultMessage'=>'failure',
     'data'=>[
     ]
     ];
-    //set a initial value for currentbalance and finalAmount
-$currentbalance=0;
-$finalAmount=0;
-//connect to sql
-$connection=sqlConnection();
-//insert query from transaction_history table
-$query="INSERT INTO transaction_history(accountno,type,date,amount) VALUES(" .$data->accountno . "," . "'". 'deposit' . "'" . "," . "'".date('Y-m-d h:i:s')."'" . "," .$data->amount. ")";
-//execute the query if it is true
-if($connection->query($query)=== true)
-{
-//get the currentbalance from user table accountno
+    //set a initial value for currentBalance and finalAmount
 
-$query="select currentbalance from user
-WHERE id =$data->accountno";
-$result=$connection->query($query);
+$currentBalance = 0;
+$finalAmount = 0;
+//connect to sql
+
+$connection = sqlConnection();
+
+//insert query from transaction_history table
+
+$query="INSERT INTO transaction_history(accountno,type,date,amount) VALUES(" .$data->accountno . "," . "'". 'deposit' . "'" . "," . "'".date('Y-m-d h:i:s')."'" . "," .$data->amount. ")";
+
+//execute the query if it is true
+
+if($connection->query($query) === true)
+{
+
+//get the currentBalance from user table accountno
+
+$query = "select currentBalance from user
+WHERE id = $data->accountno";
+$result = $connection->query($query);
+
 //check if the result of the row has more than 0 row
 
-if($result->num_rows>0){
+if($result->num_rows>0){ 
+
 //while loop iterates each row in the result
 
     while($row=$result->fetch_assoc()){
-        $currentbalance=$row['currentbalance'];
+        $currentBalance=$row['currentBalance'];
     }
-    if($data->amount <= $currentbalance){
+    if($data->amount <= $currentBalance){
 
-    
-// to find the finalAmount add currentbalance and depositAmount
-$finalAmount=$currentbalance-$data->amount;
-//update user table with currentbalance 
-$query="update user set currentbalance=$finalAmount WHERE id=$data->accountno";
+// to find the finalAmount add currentBalance and depositAmount 
+
+$finalAmount=$currentBalance-$data->amount; 
+
+//update user table with currentBalance
+
+$query="update user set currentBalance=$finalAmount WHERE id=$data->accountno";
+
 //execute the update query
+
 $updateResult=$connection->query($query);
+
 //check if the result of the update query is equal to 1
+
 if($updateResult==1){
+
     // display the success msg if it is true
-    $response=[
+
+    $response = [
         'resultCode'=>200,
         'message'=>'Amount deposited successfully ',
         'resultMessage'=>'success',
@@ -57,7 +76,7 @@ if($updateResult==1){
 }
 }
 }else{
-    $response=[
+    $response = [
         'resultCode'=>200,
         'message'=>'Insufficient balance',
         'resultMessage'=>'failure',
